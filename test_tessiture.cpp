@@ -37,8 +37,8 @@ unsigned int loadTexture(const char* path);
 void RenderScene(Shader &shader);
 
 // Impostazioni finestra (risoluzione)
-const unsigned int SCR_WIDTH = 1700;
-const unsigned int SCR_HEIGHT = 1100;
+const unsigned int SCR_WIDTH = 1800;
+const unsigned int SCR_HEIGHT = 1200;
 
 // Shadow map resolution
 const unsigned int SHADOW_WIDTH = 8096, SHADOW_HEIGHT = 8096;
@@ -224,6 +224,9 @@ int main()
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
+
+    ImFont* font = io.Fonts->AddFontFromFileTTF("Progetto/x64/Debug/Font/Timeline.ttf", 18.0f * (SCR_HEIGHT / 1080.0f));
+    io.FontDefault = font;
 
 
 
@@ -459,6 +462,7 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         // Finestra custom
+        ImGui::SetNextWindowSize(ImVec2(SCR_WIDTH * 0.19f, SCR_HEIGHT * 0.08f), ImGuiCond_Always);
         ImGui::Begin("Material Info");
         ImGui::Text("Materiale corrente: %s", materiali_sel[materialeCorrente].c_str());
         ImGui::Text("Intensita luci laterali: %s", intensitaLabels[livelloIntensitaLuci]);
