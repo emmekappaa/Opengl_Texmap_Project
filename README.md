@@ -37,3 +37,13 @@ This project was developed by **Michele Cipriani** and **Tommaso Vilotto**.
 ## Course
 
 The project was created for the **Graphics Programming** course at the University of Verona (UniVR), edition 2024-2025.
+
+---
+
+## Visual Preview
+
+![Visual Preview](docs/images/video.gif)
+
+![Studio](docs/images/Studio.png)
+
+![wall-e](docs/images/wall-e.png)
