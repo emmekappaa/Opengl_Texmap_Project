@@ -1,0 +1,112 @@
+# Blender 4.4.3 MTL File: 'scena.blend'
+# www.blender.org
+
+newmtl Body.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/arcade/Body_baseColor.jpeg
+map_Ke tex/arcade/Body_emissive.jpeg
+map_Bump -bm 1.000000 tex/arcade/Body_normal.png
+
+newmtl BodyLateral.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/arcade/BodyLateral_baseColor.jpeg
+map_Bump -bm 1.000000 tex/arcade/BodyLateral_normal.png
+
+newmtl BodyMetal.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/arcade/BodyMetal_baseColor.jpeg
+map_Bump -bm 1.000000 tex/arcade/BodyMetal_normal.png
+
+newmtl Buttons.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/arcade/Buttons_baseColor.jpeg
+map_Ke tex/arcade/Buttons_emissive.jpeg
+map_Bump -bm 1.000000 tex/arcade/Buttons_normal.png
+
+newmtl FicheiroBody.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/arcade/FicheiroBody_baseColor.jpeg
+map_Bump -bm 1.000000 tex/arcade/FicheiroBody_normal.png
+
+newmtl KeyLockMetal.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/arcade/KeyLockMetal_baseColor.jpeg
+map_Bump -bm 1.000000 tex/arcade/KeyLockMetal_normal.png
+
+newmtl Screen.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/arcade/Screen_baseColor.jpeg
+map_Ke tex/arcade/Screen_emissive.jpeg
+map_Bump -bm 1.000000 tex/arcade/Screen_normal.png
+
+newmtl Speaker.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd tex/arcade/Speaker_baseColor.png
+map_d tex/arcade/Speaker_baseColor.png
+map_Bump -bm 1.000000 tex/arcade/Speaker_normal.png
+
+newmtl Stick.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/arcade/Stick_baseColor.jpeg
+map_Ke tex/arcade/Stick_emissive.jpeg
+map_Bump -bm 1.000000 tex/arcade/Stick_normal.png
+
+newmtl material
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/arcade/material_baseColor.jpeg
+map_Bump -bm 1.000000 tex/arcade/material_normal.png

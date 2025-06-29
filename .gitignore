@@ -1,0 +1,16 @@
+*.vcxproj.user
+*.sln.docstates
+.vs/
+*.suo
+*.user
+
+# File di log 
+*.log
+*.tlog
+*.recipe
+*.ilk
+*.pdb
+*.aps
+
+# Altri file generati
+imgui.ini

@@ -1,0 +1,72 @@
+# MTL File for Wall-e model
+# Generated based on provided texture set
+
+# Material: 1 glass
+newmtl 1 glass
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.520000
+d 0.200000
+illum 9
+map_Kd tex/wall_e/Wall-e tex 4_1 glass_BaseColor.1001.png
+map_Bump -bm 1.000000 tex/wall_e/Wall-e tex 4_1 glass_Normal.1001.png
+# OcclusionRoughnessMetallic mapped to Ns (specular exponent/roughness)
+map_Ns tex/wall_e/Wall-e tex 4_1 glass_OcclusionRoughnessMetallic.1001.png
+
+# Material: 2 head hands
+newmtl 2 head hands
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd tex/wall_e/Wall-e tex 4_2 head hands_BaseColor.1001.png
+map_Bump -bm 1.000000 tex/wall_e/Wall-e tex 4_2 head hands_Normal.1001.png
+# PBR maps (Roughness/Metallic) mapped to legacy MTL slots
+map_Ns tex/wall_e/Wall-e tex 4_2 head hands_OcclusionRoughnessMetallic.1001.png
+map_refl tex/wall_e/Wall-e tex 4_2 head hands_OcclusionRoughnessMetallic.1001.png
+
+# Material: 3 body
+newmtl 3 body
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 1.000000 1.000000 1.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd tex/wall_e/Wall-e tex 4_3 body_BaseColor.1001.png
+map_Ke tex/wall_e/Wall-e tex 4_3 body_Emissive.1001.png
+map_Bump -bm 1.000000 tex/wall_e/Wall-e tex 4_3 body_Normal.1001.png
+# PBR maps (Roughness/Metallic) mapped to legacy MTL slots
+map_Ns tex/wall_e/Wall-e tex 4_3 body_OcclusionRoughnessMetallic.1001.png
+map_refl tex/wall_e/Wall-e tex 4_3 body_OcclusionRoughnessMetallic.1001.png
+
+# Material: 4 legs
+newmtl 4 legs
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd tex/wall_e/Wall-e tex 4_4 legs_BaseColor.1001.png
+map_Bump -bm 1.000000 tex/wall_e/Wall-e tex 4_4 legs_Normal.1001.png
+# PBR maps (Roughness/Metallic) mapped to legacy MTL slots
+map_Ns tex/wall_e/Wall-e tex 4_4 legs_OcclusionRoughnessMetallic.1001.png
+map_refl tex/wall_e/Wall-e tex 4_4 legs_OcclusionRoughnessMetallic.1001.png
+
+# Material: 5 gus
+newmtl 5 gus
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd tex/wall_e/Wall-e tex 4_5 gus_BaseColor.1001.png
+map_Bump -bm 1.000000 tex/wall_e/Wall-e tex 4_5 gus_Normal.1001.png
+# PBR maps (Roughness/Metallic) mapped to legacy MTL slots
+map_Ns tex/wall_e/Wall-e tex 4_5 gus_OcclusionRoughnessMetallic.1001.png
+map_refl tex/wall_e/Wall-e tex 4_5 gus_OcclusionRoughnessMetallic.1001.png

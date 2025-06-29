@@ -1,0 +1,13 @@
+# Blender 4.4.3 MTL File: 'ceiling_fan_(BLEND).blend'
+# www.blender.org
+
+newmtl ceiling_fan
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/ventola_soffitto/ceiling_fan_BaseColor.jpg
+map_Bump -bm 1.000000 tex/ventola_soffitto/ceiling_fan_Normal_GL.png
+map_Ns tex/ventola_soffitto/ceiling_fan_Roughness.png
+

@@ -1,0 +1,10 @@
+newmtl set1
+
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 0.00
+illum 4
+map_Kd tex/tavolino/table_basecolor.png
+map_Bump tex/tavolino/table_normal.png
+map_Ks tex/tavolino/table_roughness.png

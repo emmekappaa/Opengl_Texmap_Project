@@ -1,1 +1,31 @@
-* text=auto
+* text=auto eol=lf
+
+*.c text
+*.cpp text
+*.h text
+*.hpp text
+*.inl text
+*.glsl text
+*.fs text
+*.vs text
+*.obj text
+*.mtl text
+*.txt text
+*.md text
+*.gitignore text
+*.gitattributes text
+*.sln text
+*.vcxproj text
+*.vcxproj.filters text
+
+*.dll binary
+*.lib binary
+*.exe binary
+*.pdb binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.tga binary
+*.psd binary
+*.fbx binary
+*.ttf binary
