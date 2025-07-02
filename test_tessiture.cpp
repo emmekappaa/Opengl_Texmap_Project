@@ -59,9 +59,9 @@ float lastFrame = 0.0f; // Tempo dell'ultimo frame
 float planeVertices[] = {
     // positions          // normals         // texcoords   // tangent           // bitangente
     -1.0f, 0.0f, -1.0f,   0,1,0,            0.0f, 0.0f,   1,0,0,              0,0,1,
-     1.0f, 0.0f, -1.0f,   0,1,0,           10.0f, 0.0f,   1,0,0,              0,0,1,
-     1.0f, 0.0f,  1.0f,   0,1,0,           10.0f,10.0f,   1,0,0,              0,0,1,
-    -1.0f, 0.0f,  1.0f,   0,1,0,            0.0f,10.0f,   1,0,0,              0,0,1
+     1.0f, 0.0f, -1.0f,   0,1,0,           100.0f, 0.0f,   1,0,0,              0,0,1,
+     1.0f, 0.0f,  1.0f,   0,1,0,           100.0f,100.0f,   1,0,0,              0,0,1,
+    -1.0f, 0.0f,  1.0f,   0,1,0,            0.0f,100.0f,   1,0,0,              0,0,1
 };
 
 unsigned int planeIndices[] = {
@@ -86,7 +86,19 @@ float wallVertices[] = {
 
 unsigned int wallIndices[] = { 0, 1, 2, 2, 3, 0 };
 unsigned int wallVAO = 0, wallVBO = 0, wallEBO = 0;
-unsigned int wallDiffuse, wallNormal;
+unsigned int wallDiffuse, wallNormal, wallRoughness;
+
+
+unsigned int ceilingVAO = 0, ceilingVBO = 0, ceilingEBO = 0;
+float ceilingVertices[] = {
+    // positions          // normals         // texcoords   // tangent           // bitangente
+    -1.0f, 0.0f, -1.0f,   0,1,0,            0.0f, 0.0f,   1,0,0,              0,0,1,
+     1.0f, 0.0f, -1.0f,   0,1,0,            10.0f, 0.0f,   1,0,0,              0,0,1,
+     1.0f, 0.0f,  1.0f,   0,1,0,            10.0f, 10.0f,   1,0,0,              0,0,1,
+    -1.0f, 0.0f,  1.0f,   0,1,0,            0.0f, 10.0f,   1,0,0,              0,0,1
+};
+unsigned int ceilingIndices[] = { 0, 1, 2, 2, 3, 0 };
+
 
 // posizione faro sinistro
 glm::vec3 farettoSxPos = glm::vec3(
@@ -196,6 +208,7 @@ int livelloIntensitaLuci = 1; // 0=spento, 1=bassa, 2=media, 3=alta
 
 const char* intensitaLabels[] = { "Off", "Low", "Medium", "High" };
 
+bool showSceneObjects = true;
 
 int main()
 {
@@ -271,13 +284,17 @@ int main()
     Shader shader("progetto.vs", "progetto.fs");
     Shader shadowMappingShader("shadow_mapping.vs", "shadow_mapping.fs");
 
-    // Configurazione shadow mapping per luceDx e luceSx
+    // Configurazione shadow mapping per luceDx, luceSx e luce centrale
     unsigned int depthMapFBOLuceDx, depthMapFBOLuceSx;
+    unsigned int depthMapFBOCentro, depthMapLuceCentro; // Shadow map centrale
     glGenFramebuffers(1, &depthMapFBOLuceDx);
     glGenFramebuffers(1, &depthMapFBOLuceSx);
+    glGenFramebuffers(1, &depthMapFBOCentro);
     unsigned int depthMapLuceDx, depthMapLuceSx;
     glGenTextures(1, &depthMapLuceDx);
     glGenTextures(1, &depthMapLuceSx);
+    glGenTextures(1, &depthMapLuceCentro);
+
     // LuceDx
     glBindTexture(GL_TEXTURE_2D, depthMapLuceDx);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
@@ -304,6 +321,21 @@ int main()
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBOLuceSx);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapLuceSx, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // Shadow map centrale
+    // Inizializzazione texture e FBO centrale
+    glBindTexture(GL_TEXTURE_2D, depthMapLuceCentro);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+        SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBOCentro);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapLuceCentro, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -335,15 +367,43 @@ int main()
     glEnableVertexAttribArray(4);
     glBindVertexArray(0);
 
+
+    // Inizializzazione VAO/VBO/EBO per il soffitto
+    glGenVertexArrays(1, &ceilingVAO);
+    glGenBuffers(1, &ceilingVBO);
+    glGenBuffers(1, &ceilingEBO);
+
+    glBindVertexArray(ceilingVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, ceilingVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(ceilingVertices), ceilingVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ceilingEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ceilingIndices), ceilingIndices, GL_STATIC_DRAW);
+    // posizione
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // normale
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texcoords
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // tangente
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+    // bitangente
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(11 * sizeof(float)));
+    glEnableVertexAttribArray(4);
+    glBindVertexArray(0);
+
     // === Caricamento texture per il Soffitto ===
     ceilingDiffuse = loadTexture("./Progetto/x64/Debug/tex/soffitto/Ceiling_Drop_Tiles_001_basecolor.jpg");
     ceilingNormal = loadTexture("./Progetto/x64/Debug/tex/soffitto/Ceiling_Drop_Tiles_001_normal.jpg");
     ceilingRoughness = loadTexture("./Progetto/x64/Debug/tex/soffitto/Ceiling_Drop_Tiles_001_roughness.jpg");
 
     // === Caricamento texture Poliigon per il pavimento ===
-    floorDiffuse = loadTexture("./Progetto/x64/Debug/tex/poligon_woodfloor/Poliigon_WoodFloorAsh_4186_BaseColor.jpg");
-    floorNormal = loadTexture("./Progetto/x64/Debug/tex/poligon_woodfloor/Poliigon_WoodFloorAsh_4186_Normal.png");
-    floorRoughness = loadTexture("./Progetto/x64/Debug/tex/poligon_woodfloor/Poliigon_WoodFloorAsh_4186_Roughness.jpg");
+    floorDiffuse = loadTexture("./Progetto/x64/Debug/tex/pavimento_cemento/Poliigon_ConcreteFloorPoured_7656_BaseColor.jpg");
+    floorNormal = loadTexture("./Progetto/x64/Debug/tex/pavimento_cemento/Poliigon_ConcreteFloorPoured_7656_Normal.png");
+    floorRoughness = loadTexture("./Progetto/x64/Debug/tex/pavimento_cemento/Poliigon_ConcreteFloorPoured_7656_Roughness.jpg");
 
     // === Inizializzazione VAO/VBO/EBO per il muro ===
     glGenVertexArrays(1, &wallVAO);
@@ -373,8 +433,9 @@ int main()
     glBindVertexArray(0);
 
     // === Caricamento texture per i muri ===
-    wallDiffuse = loadTexture("./Progetto/x64/Debug/tex/muri/color.png");
-    wallNormal = loadTexture("./Progetto/x64/Debug/tex/muri/normal_muro.png");
+    wallDiffuse = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_BaseColor.jpg");
+    wallNormal = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_Normal.png");
+	wallRoughness = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_Roughness.jpg");
 
 
 
@@ -423,9 +484,24 @@ int main()
         RenderScene(shadowMappingShader);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        // Rendering shadow map per luce centrale
+        glm::vec3 luceCentroPos = 0.5f * (luceDxPos + luceSxPos) + glm::vec3(0.0f, 0.5f, 0.0f); // più alta
+        glm::vec3 luceCentroTarget = 0.5f * (luceDxTarget + luceSxTarget) + glm::vec3(0.0f, 0.5f, 0.0f); // punta più in basso
+        glm::mat4 luceCentroProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
+        glm::mat4 luceCentroView = glm::lookAt(luceCentroPos, luceCentroTarget, glm::vec3(0, 1, 0));
+        glm::mat4 luceCentroSpaceMatrix = luceCentroProjection * luceCentroView;
+        shadowMappingShader.use();
+        shadowMappingShader.setMat4("lightSpaceMatrix", luceCentroSpaceMatrix);
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBOCentro);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        RenderScene(shadowMappingShader);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         //Rendering normale della scena con shadow mapping
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); //sfondo bianco
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.use();
@@ -464,6 +540,10 @@ int main()
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, depthMapLuceSx);
         shader.setInt("shadowMapLuceSx", 6);
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, depthMapLuceCentro);
+        shader.setInt("shadowMapLuceCentro", 7);
+        shader.setMat4("luceCentroSpaceMatrix", luceCentroSpaceMatrix);
 
         // Renderizza la scena
         RenderScene(shader);
@@ -533,6 +613,16 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE) {
         mPressed = false;
     }
+
+    static bool cPressed = false;
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS && !cPressed) {
+        showSceneObjects = !showSceneObjects;
+        cPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE) {
+        cPressed = false;
+    }
+
 
     // --- Gestione intensità luci laterali con L ---
     static bool lPressed = false;
@@ -651,82 +741,148 @@ void RenderScene(Shader &shader)
     shader.setMat4("model", model);
     if (personaggio) personaggio->Draw(shader);
 
-    // Modello del faretto dx
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(1.0f));
-    shader.setMat4("model", model);
-    if(farettodx) farettodx->Draw(shader);
+    if (showSceneObjects) {
+        // Modello del faretto dx
+        model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(1.0f));
+        shader.setMat4("model", model);
+        if(farettodx) farettodx->Draw(shader);
 
-    // Modello del faretto sx
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(1.0f));
-    shader.setMat4("model", model);
-    if(farettosx) farettosx->Draw(shader);
+        // Modello del faretto sx
+        model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(1.0f));
+        shader.setMat4("model", model);
+        if(farettosx) farettosx->Draw(shader);
 
-    // Modello del telo/rampa
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.01f, 0.0f));
-    model = glm::scale(model, glm::vec3(0.6f));
-    shader.setMat4("model", model);
-    if(telo) telo->Draw(shader);
+        // Modello del telo/rampa
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.01f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.6f));
+        shader.setMat4("model", model);
+        if(telo) telo->Draw(shader);
 
-    // Modello della ventola
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 2.7f, 0.0f));
-    model = glm::scale(model, glm::vec3(0.6f));
-    shader.setMat4("model", model);
-    if(ventola) ventola->Draw(shader);
+        // Modello della ventola
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 2.7f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.6f));
+        shader.setMat4("model", model);
+        if(ventola) ventola->Draw(shader);
 
-    // Modello del divanetto
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(2.0f, 0.01f, 5.5f));
-    model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));
-    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(0, 1, 0));
-    model = glm::scale(model, glm::vec3(1.0f));
-    shader.setMat4("model", model);
-    if(divanetto) divanetto->Draw(shader);
+        // Modello del divanetto
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.0f, 0.01f, 5.5f));
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));
+        model = glm::rotate(model, glm::radians(20.0f), glm::vec3(0, 1, 0));
+        model = glm::scale(model, glm::vec3(1.0f));
+        shader.setMat4("model", model);
+        if(divanetto) divanetto->Draw(shader);
 
-    // Modello del divanetto 2
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-2.0f, 0.01f, 5.5f));
-    model = glm::rotate(model, glm::radians(160.0f), glm::vec3(0, 1, 0));
-    model = glm::scale(model, glm::vec3(1.0f));
-    shader.setMat4("model", model);
-    if(divanetto2) divanetto2->Draw(shader);
+        // Modello del divanetto 2
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-2.0f, 0.01f, 5.5f));
+        model = glm::rotate(model, glm::radians(160.0f), glm::vec3(0, 1, 0));
+        model = glm::scale(model, glm::vec3(1.0f));
+        shader.setMat4("model", model);
+        if(divanetto2) divanetto2->Draw(shader);
 
-    // Modello del tavolino
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.01f, 5.2f));
-    model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));
-    model = glm::scale(model, glm::vec3(0.03f));
-    shader.setMat4("model", model);
-    if(tavolino) tavolino->Draw(shader);
+        // Modello del tavolino
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.01f, 5.2f));
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));
+        model = glm::scale(model, glm::vec3(0.03f));
+        shader.setMat4("model", model);
+        if(tavolino) tavolino->Draw(shader);
 
-    // Modello della fotocamera
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.78f, 5.2f));
-    model = glm::scale(model, glm::vec3(1.0f));
-    shader.setMat4("model", model);
-    if(fotocamera) fotocamera->Draw(shader);
+        // Modello della fotocamera
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.78f, 5.2f));
+        model = glm::scale(model, glm::vec3(1.0f));
+        shader.setMat4("model", model);
+        if(fotocamera) fotocamera->Draw(shader);
 
-    // Modello della wall_e
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(8.5f, 0.01f, 6.2f));
-    model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0, 1, 0));
-    model = glm::scale(model, glm::vec3(0.008f));
-    shader.setMat4("model", model);
-    if (wall_e) wall_e->Draw(shader);
+        // Modello della wall_e
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(8.5f, 0.01f, 6.2f));
+        model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0, 1, 0));
+        model = glm::scale(model, glm::vec3(0.008f));
+        shader.setMat4("model", model);
+        if (wall_e) wall_e->Draw(shader);
 
-    // Modello della macchina arcade
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-8.2f, 0.01f, 6.2f));
-    model = glm::rotate(model, glm::radians(120.0f), glm::vec3(0, 1, 0));
-    model = glm::scale(model, glm::vec3(1.0f));
-    shader.setMat4("model", model);
-    if (arcade) arcade->Draw(shader);
+        // Modello della macchina arcade
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-8.2f, 0.01f, 6.2f));
+        model = glm::rotate(model, glm::radians(120.0f), glm::vec3(0, 1, 0));
+        model = glm::scale(model, glm::vec3(1.0f));
+        shader.setMat4("model", model);
+        if (arcade) arcade->Draw(shader);
 
+        // === Soffitto ===
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, ceilingDiffuse);
+        shader.setInt("texture_diffuse1", 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, ceilingNormal);
+        shader.setInt("texture_normal1", 1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, ceilingRoughness);
+        shader.setInt("texture_specular1", 2);
 
-    // === Pavimento ===
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-0.0029815f, 3.0f, 1.5337835f));
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1, 0, 0));
+        model = glm::scale(model, glm::vec3(9.288005f, 1.0f, 5.676001f));
+        shader.setMat4("model", model);
+        glBindVertexArray(ceilingVAO);        
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // === Muri ===
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, wallDiffuse);
+        shader.setInt("texture_diffuse1", 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, wallNormal);
+        shader.setInt("texture_normal1", 1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, wallRoughness);
+        shader.setInt("texture_specular1", 2);
+
+        float wall_height = 3.0f;
+        float wall_thickness = 1.0f;
+        glm::vec3 floor_center_position = glm::vec3(-0.0029815f, 0.0f, 1.5337835f);
+        float floor_size_x = 9.288005f;
+        float floor_size_z = 5.676001f;
+        // Back wall
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, floor_center_position + glm::vec3(0.0f, 0.0f, -floor_size_z/2.0f - wall_thickness/2.0f - 2.34f));
+        model = glm::scale(model, glm::vec3(floor_size_x, wall_height, wall_thickness));
+        shader.setMat4("model", model);
+        glBindVertexArray(wallVAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // Front wall
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, floor_center_position + glm::vec3(0.0f, 0.0f, floor_size_z/2.0f + wall_thickness/2.0f + 2.34f));
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));
+        model = glm::scale(model, glm::vec3(floor_size_x, wall_height, wall_thickness));
+        shader.setMat4("model", model);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // Left wall
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, floor_center_position + glm::vec3(-floor_size_x/2.0f - wall_thickness/2.0f - 4.14f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0,1,0));
+        model = glm::scale(model, glm::vec3(floor_size_z, wall_height, wall_thickness));
+        shader.setMat4("model", model);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // Right wall
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, floor_center_position + glm::vec3(floor_size_x/2.0f + wall_thickness/2.0f + 4.14f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0,1,0));
+        model = glm::scale(model, glm::vec3(floor_size_z, wall_height, wall_thickness));
+        shader.setMat4("model", model);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    }
+
+    // === Pavimento: sempre visibile ===
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, floorDiffuse);
     shader.setInt("texture_diffuse1", 0);
@@ -737,75 +893,14 @@ void RenderScene(Shader &shader)
     glBindTexture(GL_TEXTURE_2D, floorRoughness);
     shader.setInt("texture_specular1", 2);
 
-    float floor_size_x = 9.288005f;
-    float floor_size_z = 5.676001f;
     glm::vec3 floor_center_position = glm::vec3(-0.0029815f, 0.0f, 1.5337835f);
     model = glm::mat4(1.0f);
     model = glm::translate(model, floor_center_position);
-    model = glm::scale(model, glm::vec3(floor_size_x, 1.0f, floor_size_z));
+    model = glm::scale(model, glm::vec3(100.0f, 1.0f, 100.0f));
+    //model = glm::scale(model, glm::vec3(9.288005f, 1.0f, 5.676001f));
     shader.setMat4("model", model);
-    glBindVertexArray(planeVAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-    // === Muri ===
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, wallDiffuse);
-    shader.setInt("texture_diffuse1", 0);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, wallNormal);
-    shader.setInt("texture_normal1", 1);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, floorRoughness); // Usa la stessa roughness del pavimento
-    shader.setInt("texture_specular1", 2);
 
-    float wall_height = 3.0f;
-    float wall_thickness = 1.0f;
-    // Back wall
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, floor_center_position + glm::vec3(0.0f, 0.0f, -floor_size_z/2.0f - wall_thickness/2.0f - 2.34f));
-    model = glm::scale(model, glm::vec3(floor_size_x, wall_height, wall_thickness));
-    shader.setMat4("model", model);
-    glBindVertexArray(wallVAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    // Front wall
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, floor_center_position + glm::vec3(0.0f, 0.0f, floor_size_z/2.0f + wall_thickness/2.0f + 2.34f));
-    model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));
-    model = glm::scale(model, glm::vec3(floor_size_x, wall_height, wall_thickness));
-    shader.setMat4("model", model);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    // Left wall
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, floor_center_position + glm::vec3(-floor_size_x/2.0f - wall_thickness/2.0f - 4.14f, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0,1,0));
-    model = glm::scale(model, glm::vec3(floor_size_z, wall_height, wall_thickness));
-    shader.setMat4("model", model);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    // Right wall
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, floor_center_position + glm::vec3(floor_size_x/2.0f + wall_thickness/2.0f + 4.14f, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));
-    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0,1,0));
-    model = glm::scale(model, glm::vec3(floor_size_z, wall_height, wall_thickness));
-    shader.setMat4("model", model);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    // === Soffitto ===
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, ceilingDiffuse);
-    shader.setInt("texture_diffuse1", 0);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, ceilingNormal);
-    shader.setInt("texture_normal1", 1);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, ceilingRoughness);
-    shader.setInt("texture_specular1", 2);
-
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, floor_center_position + glm::vec3(0.0f, 3.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1, 0, 0));
-    model = glm::scale(model, glm::vec3(floor_size_x, 1.0f, floor_size_z));
-    shader.setMat4("model", model);
     glBindVertexArray(planeVAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
