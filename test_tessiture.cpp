@@ -137,10 +137,10 @@ struct MaterialSet {
 
 // Array di materiali disponibili
 MaterialSet materiali[] = {
-    { // defaultFabric
-        "./Progetto/x64/Debug/tex/defaultFabric/rp_manuel_animated_001_dif.jpg",
-        "./Progetto/x64/Debug/tex/defaultFabric/rp_manuel_animated_001_gloss.jpg",
-        "./Progetto/x64/Debug/tex/defaultFabric/rp_manuel_animated_001_norm.jpg"
+    { // manuel originale
+        "./Progetto/x64/Debug/tex/manuel_originale/rp_manuel_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/manuel_originale/rp_manuel_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/manuel_originale/rp_manuel_animated_001_norm.jpg"
     },
     { // boucleFabric
         "./Progetto/x64/Debug/tex/boucleFabric/rp_manuel_animated_001_dif.jpg",
