@@ -137,6 +137,11 @@ struct MaterialSet {
 
 // Array di materiali disponibili
 MaterialSet materiali[] = {
+    { // defaultFabric
+        "./Progetto/x64/Debug/tex/defaultFabric/rp_manuel_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/defaultFabric/rp_manuel_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/defaultFabric/rp_manuel_animated_001_norm.jpg"
+    },
     { // boucleFabric
         "./Progetto/x64/Debug/tex/boucleFabric/rp_manuel_animated_001_dif.jpg",
         "./Progetto/x64/Debug/tex/boucleFabric/rp_manuel_animated_001_gloss.jpg",
@@ -161,17 +166,24 @@ MaterialSet materiali[] = {
         "./Progetto/x64/Debug/tex/towelCotton/rp_manuel_animated_001_dif.jpg",
         "./Progetto/x64/Debug/tex/towelCotton/rp_manuel_animated_001_gloss_nera.jpg",
         "./Progetto/x64/Debug/tex/towelCotton/rp_manuel_animated_001_norm.jpg"
+    },
+    { // denim
+        "./Progetto/x64/Debug/tex/denim/rp_manuel_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/denim/rp_manuel_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/denim/rp_manuel_animated_001_norm.jpg"
     }
 };
 const int numMateriali = sizeof(materiali) / sizeof(MaterialSet);
 int materialeCorrente = 0;
 
 string materiali_sel[] = {
+    "Default Fabric",
     "Boucle Fabric",
     "Leather",
     "Red Cotton",
     "Simil Lino",
-    "Towel Cotton"
+    "Towel Cotton",
+    "Denim"
 };
 
 unsigned int personaggioDiffuse[numMateriali];
