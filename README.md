@@ -58,4 +58,4 @@ The project was created for the **Graphics Programming** course at the Universit
 
 ![Studio](docs/images/Studio.png)
 
-![wall-e](docs/images/wall-e.png)
+![wall-e image](docs/images/wall-e_img.png)
