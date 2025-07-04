@@ -44,9 +44,11 @@ The project was created for the **Graphics Programming** course at the Universit
 
 ![Visual Preview](docs/images/video.gif)
 
-![Studio](docs/images/gloss_nera.png)
+![Ambiente](docs/images/ambiente.gif)
 
-![Studio](docs/images/tessuto2_schiena.png)
+![Front](docs/images/front_denim_2.png)
+
+![Back](docs/images/back_boucle.png)
 
 ![Studio](docs/images/Studio.png)
 
