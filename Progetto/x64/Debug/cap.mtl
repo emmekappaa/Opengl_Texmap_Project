@@ -1,0 +1,24 @@
+# Blender 4.4.3 MTL File: 'None'
+# www.blender.org
+
+newmtl buckethat2_FRONT_460466
+Ns 28.763235
+Ka 1.000000 1.000000 1.000000
+Ks 0.075000 0.075000 0.075000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/cap/bucket_hat_gen8_thin_weld_toshitimo_diffuse_1001.png
+map_Bump tex/cap/bucket_hat_gen8_thin_weld_toshitimo_normal_1001.png
+
+newmtl buckethat_FRONT_3357
+Ns 28.763235
+Ka 1.000000 1.000000 1.000000
+Ks 0.075000 0.075000 0.075000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tex/cap/bucket_hat_gen8_thin_weld_toshitimo_diffuse_1001.png
+map_Bump tex/cap/bucket_hat_gen8_thin_weld_toshitimo_normal_1001.png

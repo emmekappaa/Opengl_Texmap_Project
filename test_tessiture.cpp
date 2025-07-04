@@ -140,6 +140,7 @@ Model* tavolino = nullptr;
 Model* fotocamera = nullptr;
 Model* wall_e = nullptr;
 Model* arcade = nullptr;
+Model* cap = nullptr;
 
 struct MaterialSet {
     std::string diffuse;
@@ -149,40 +150,40 @@ struct MaterialSet {
 
 // Array di materiali disponibili
 MaterialSet materiali[] = {
-    { // manuel originale
-        "./Progetto/x64/Debug/tex/manuel_originale/rp_manuel_animated_001_dif.jpg",
-        "./Progetto/x64/Debug/tex/manuel_originale/rp_manuel_animated_001_gloss.jpg",
-        "./Progetto/x64/Debug/tex/manuel_originale/rp_manuel_animated_001_norm.jpg"
+    { // erika originale
+        "./Progetto/x64/Debug/tex/erika_originale/rp_erika_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/erika_originale/rp_erika_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/erika_originale/rp_erika_animated_001_norm.jpg"
     },
     { // boucleFabric
-        "./Progetto/x64/Debug/tex/boucleFabric/rp_manuel_animated_001_dif.jpg",
-        "./Progetto/x64/Debug/tex/boucleFabric/rp_manuel_animated_001_gloss.jpg",
-        "./Progetto/x64/Debug/tex/boucleFabric/rp_manuel_animated_001_norm.jpg"
+        "./Progetto/x64/Debug/tex/boucleFabric/rp_erika_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/boucleFabric/rp_erika_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/boucleFabric/rp_erika_animated_001_norm.jpg"
     },
     { // leather
-        "./Progetto/x64/Debug/tex/leather/rp_manuel_animated_001_dif.jpg",
-        "./Progetto/x64/Debug/tex/leather/rp_manuel_animated_001_gloss.jpg",
-        "./Progetto/x64/Debug/tex/leather/rp_manuel_animated_001_norm.jpg"
+        "./Progetto/x64/Debug/tex/leather/rp_erika_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/leather/rp_erika_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/leather/rp_erika_animated_001_norm.jpg"
     },
     { // redCotton
-        "./Progetto/x64/Debug/tex/redCotton/rp_manuel_animated_001_dif.jpg",
-        "./Progetto/x64/Debug/tex/redCotton/rp_manuel_animated_001_gloss.jpg",
-        "./Progetto/x64/Debug/tex/redCotton/rp_manuel_animated_001_norm.jpg"
+        "./Progetto/x64/Debug/tex/redCotton/rp_erika_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/redCotton/rp_erika_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/redCotton/rp_erika_animated_001_norm.jpg"
     },
     { // simiLino
-        "./Progetto/x64/Debug/tex/simiLino/rp_manuel_animated_001_dif.jpg",
-        "./Progetto/x64/Debug/tex/simiLino/rp_manuel_animated_001_gloss.jpg",
-        "./Progetto/x64/Debug/tex/simiLino/rp_manuel_animated_001_norm.jpg"
+        "./Progetto/x64/Debug/tex/simiLino/rp_erika_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/simiLino/rp_erika_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/simiLino/rp_erika_animated_001_norm.jpg"
     },
     { // towelCotton
-        "./Progetto/x64/Debug/tex/towelCotton/rp_manuel_animated_001_dif.jpg",
-        "./Progetto/x64/Debug/tex/towelCotton/rp_manuel_animated_001_gloss_nera.jpg",
-        "./Progetto/x64/Debug/tex/towelCotton/rp_manuel_animated_001_norm.jpg"
+        "./Progetto/x64/Debug/tex/towelCotton/rp_erika_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/towelCotton/rp_erika_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/towelCotton/rp_erika_animated_001_norm.jpg"
     },
     { // denim
-        "./Progetto/x64/Debug/tex/denim/rp_manuel_animated_001_dif.jpg",
-        "./Progetto/x64/Debug/tex/denim/rp_manuel_animated_001_gloss.jpg",
-        "./Progetto/x64/Debug/tex/denim/rp_manuel_animated_001_norm.jpg"
+        "./Progetto/x64/Debug/tex/denim/rp_erika_animated_001_dif.jpg",
+        "./Progetto/x64/Debug/tex/denim/rp_erika_animated_001_gloss.jpg",
+        "./Progetto/x64/Debug/tex/denim/rp_erika_animated_001_norm.jpg"
     }
 };
 const int numMateriali = sizeof(materiali) / sizeof(MaterialSet);
@@ -198,6 +199,15 @@ string materiali_sel[] = {
     "Denim"
 };
 
+
+string scena_sel[] = {
+    "Studio",
+    "white background + cemento",
+    "white background + marble tiles",
+    "white background + quarzite",
+	"white background + tiles"
+};
+
 unsigned int personaggioDiffuse[numMateriali];
 unsigned int personaggioGloss[numMateriali];
 unsigned int personaggioNormal[numMateriali];
@@ -208,7 +218,11 @@ int livelloIntensitaLuci = 1; // 0=spento, 1=bassa, 2=media, 3=alta
 
 const char* intensitaLabels[] = { "Off", "Low", "Medium", "High" };
 
-bool showSceneObjects = true;
+// === Variabili globali per gestione scena e texture extra ===
+int sceneState = 0; // 0: tutto visibile, 1: nascosto cemento, 2: nascosto Marble, 3: nascosto quarzite, 4: nascosto piastrelle
+unsigned int floorQuarziteDiffuse, floorQuarziteNormal, floorQuarziteRoughness;
+unsigned int floorTilesDiffuse, floorTilesNormal, floorTilesRoughness;
+unsigned int floorTilesMDiffuse, floorTilesMNormal, floorTilesMRoughness;
 
 int main()
 {
@@ -256,7 +270,7 @@ int main()
 
 
     // Carica i modelli 3D DOPO aver creato il contesto OpenGL
-    personaggio = new Model("Progetto/x64/Debug/manuel.obj");
+    personaggio = new Model("Progetto/x64/Debug/erika.obj");
     farettodx = new Model("Progetto/x64/Debug/faretto_dx.obj");
     farettosx = new Model("Progetto/x64/Debug/faretto_sx.obj");
     telo = new Model("Progetto/x64/Debug/studio.obj");
@@ -267,6 +281,7 @@ int main()
     fotocamera = new Model("Progetto/x64/Debug/camera.obj");
     wall_e = new Model("Progetto/x64/Debug/wall-e.obj");
     arcade = new Model("Progetto/x64/Debug/arcade.obj");
+	cap = new Model("Progetto/x64/Debug/cap.obj");
 
     // === Caricamento texture per tutti i materiali del personaggio ===
 
@@ -405,6 +420,22 @@ int main()
     floorNormal = loadTexture("./Progetto/x64/Debug/tex/pavimento_cemento/Poliigon_ConcreteFloorPoured_7656_Normal.png");
     floorRoughness = loadTexture("./Progetto/x64/Debug/tex/pavimento_cemento/Poliigon_ConcreteFloorPoured_7656_Roughness.jpg");
 
+    // === Caricamento texture piastrelle Marble ===
+    floorTilesMDiffuse = loadTexture("./Progetto/x64/Debug/tex/pavimento_stelle/Patterned_Marble_Tiles_vichadav_8K_BaseColor.jpg");
+    floorTilesMNormal = loadTexture("./Progetto/x64/Debug/tex/pavimento_stelle/Patterned_Marble_Tiles_vichadav_8K_Normal.jpg");
+    floorTilesMRoughness = loadTexture("./Progetto/x64/Debug/tex/pavimento_stelle/Patterned_Marble_Tiles_vichadav_8K_Roughness.jpg");
+
+
+    // === Caricamento texture quarzite ===
+    floorQuarziteDiffuse = loadTexture("./Progetto/x64/Debug/tex/pavimento_quarzite/Poliigon_quarzite_5212_BaseColor.jpg");
+    floorQuarziteNormal = loadTexture("./Progetto/x64/Debug/tex/pavimento_quarzite/Poliigon_quarzite_5212_Normal.png");
+    floorQuarziteRoughness = loadTexture("./Progetto/x64/Debug/tex/pavimento_quarzite/Poliigon_quarzite_5212_Roughness.jpg");
+
+    // === Caricamento texture piastrelle ===
+    floorTilesDiffuse = loadTexture("./Progetto/x64/Debug/tex/pavimento_piastrelle/Poliigon_TilesCeramicWhite_6956_BaseColor.jpg");
+    floorTilesNormal = loadTexture("./Progetto/x64/Debug/tex/pavimento_piastrelle/Poliigon_TilesCeramicWhite_6956_Normal.png");
+    floorTilesRoughness = loadTexture("./Progetto/x64/Debug/tex/pavimento_piastrelle/Poliigon_TilesCeramicWhite_6956_Roughness.jpg");
+
     // === Inizializzazione VAO/VBO/EBO per il muro ===
     glGenVertexArrays(1, &wallVAO);
     glGenBuffers(1, &wallVBO);
@@ -435,9 +466,7 @@ int main()
     // === Caricamento texture per i muri ===
     wallDiffuse = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_BaseColor.jpg");
     wallNormal = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_Normal.png");
-	wallRoughness = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_Roughness.jpg");
-
-
+    wallRoughness = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_Roughness.jpg");
 
     // Ciclo di rendering principale
     while (!glfwWindowShouldClose(window))
@@ -485,7 +514,7 @@ int main()
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Rendering shadow map per luce centrale
-        glm::vec3 luceCentroPos = 0.5f * (luceDxPos + luceSxPos) + glm::vec3(0.0f, 0.5f, 0.0f); // più alta
+        glm::vec3 luceCentroPos = 0.5f * (luceDxPos + luceSxPos) + glm::vec3(0.0f, 0.5f, 0.7f); // più alta
         glm::vec3 luceCentroTarget = 0.5f * (luceDxTarget + luceSxTarget) + glm::vec3(0.0f, 0.5f, 0.0f); // punta più in basso
         glm::mat4 luceCentroProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
         glm::mat4 luceCentroView = glm::lookAt(luceCentroPos, luceCentroTarget, glm::vec3(0, 1, 0));
@@ -554,10 +583,11 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         // Finestra custom
-        ImGui::SetNextWindowSize(ImVec2(SCR_WIDTH * 0.19f, SCR_HEIGHT * 0.08f), ImGuiCond_Always);
-        ImGui::Begin("Material Info");
+        ImGui::SetNextWindowSize(ImVec2(SCR_WIDTH * 0.215f, SCR_HEIGHT * 0.12f), ImGuiCond_Always);
+        ImGui::Begin("Info");
         ImGui::Text("Materiale corrente: %s", materiali_sel[materialeCorrente].c_str());
         ImGui::Text("Intensita luci laterali: %s", intensitaLabels[livelloIntensitaLuci]);
+        ImGui::Text("Ambiente: %s", scena_sel[sceneState].c_str());
         ImGui::End();
 
         // Rendering ImGui
@@ -582,6 +612,7 @@ int main()
     delete fotocamera;
 	delete wall_e;
     delete arcade;
+    delete cap;
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -616,7 +647,7 @@ void processInput(GLFWwindow* window)
 
     static bool cPressed = false;
     if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS && !cPressed) {
-        showSceneObjects = !showSceneObjects;
+        sceneState = (sceneState + 1) % 5;
         cPressed = true;
     }
     if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE) {
@@ -741,7 +772,14 @@ void RenderScene(Shader &shader)
     shader.setMat4("model", model);
     if (personaggio) personaggio->Draw(shader);
 
-    if (showSceneObjects) {
+    // Modello della cappello
+    model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(1.0f));
+    shader.setMat4("model", model);
+    if (cap) cap->Draw(shader);
+
+    if (sceneState == 0) {
+        // Tutti gli oggetti visibili
         // Modello del faretto dx
         model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(1.0f));
@@ -882,24 +920,59 @@ void RenderScene(Shader &shader)
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 
-    // === Pavimento: sempre visibile ===
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, floorDiffuse);
-    shader.setInt("texture_diffuse1", 0);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, floorNormal);
-    shader.setInt("texture_normal1", 1);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, floorRoughness);
-    shader.setInt("texture_specular1", 2);
+    // === Pavimento: scegli texture in base allo stato ===
+    if (sceneState == 3) {
+        // Pavimento quarzite
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, floorQuarziteDiffuse);
+        shader.setInt("texture_diffuse1", 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, floorQuarziteNormal);
+        shader.setInt("texture_normal1", 1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, floorQuarziteRoughness);
+        shader.setInt("texture_specular1", 2);
+    } else if (sceneState == 4) {
+        // Pavimento piastrelle
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, floorTilesDiffuse);
+        shader.setInt("texture_diffuse1", 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, floorTilesNormal);
+        shader.setInt("texture_normal1", 1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, floorTilesRoughness);
+        shader.setInt("texture_specular1", 2);
+	}
+    else if (sceneState == 2) {
+        // Pavimento piastrelle Marble
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, floorTilesMDiffuse);
+        shader.setInt("texture_diffuse1", 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, floorTilesMNormal);
+        shader.setInt("texture_normal1", 1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, floorTilesMRoughness);
+        shader.setInt("texture_specular1", 2);
+    } else {
+        // Pavimento cemento
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, floorDiffuse);
+        shader.setInt("texture_diffuse1", 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, floorNormal);
+        shader.setInt("texture_normal1", 1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, floorRoughness);
+        shader.setInt("texture_specular1", 2);
+    }
 
     glm::vec3 floor_center_position = glm::vec3(-0.0029815f, 0.0f, 1.5337835f);
     model = glm::mat4(1.0f);
     model = glm::translate(model, floor_center_position);
     model = glm::scale(model, glm::vec3(100.0f, 1.0f, 100.0f));
-    //model = glm::scale(model, glm::vec3(9.288005f, 1.0f, 5.676001f));
     shader.setMat4("model", model);
-
 
     glBindVertexArray(planeVAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

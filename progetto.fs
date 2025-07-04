@@ -67,7 +67,7 @@ void main()
     vec3 normal = texture(texture_normal1, fs_in.TexCoords).rgb;
     normal = normalize(normal * 2.0 - 1.0);
     vec3 color = texture(texture_diffuse1, fs_in.TexCoords).rgb;
-    vec3 ambient = 0.22 * color;
+    vec3 ambient = 0.28 * color;
     float gloss = texture(texture_specular1, fs_in.TexCoords).r;
     float shininess = mix(8.0, 128.0, gloss);
 
@@ -82,7 +82,7 @@ void main()
     vec3 spotDir = normalize(fs_in.TangentSpotDir);
     float theta = dot(lightDir, spotDir);
     float epsilon = 0.15;
-    float intensity = smoothstep(cos(radians(12.5)), cos(radians(12.5 + epsilon)), theta) * 0.7;
+    float intensity = smoothstep(cos(radians(12.5)), cos(radians(12.5 + epsilon)), theta) * 0.55;
     vec3 spotlightResult = intensity * (diffuse + specular);
 
     // --- Luce DX ---
@@ -124,7 +124,7 @@ void main()
     vec3 luceCentroConeDir = normalize(normalize(fs_in.TangentLuceDxConeDir) + normalize(fs_in.TangentLuceSxConeDir));
     float luceCentroTheta = dot(luceCentroDir, luceCentroConeDir);
     float luceCentroEpsilon = 0.05;
-    float luceCentroAngle = 0.5 * (luceDxAngle + luceSxAngle) + 5.0;
+    float luceCentroAngle = 0.5 * (luceDxAngle + luceSxAngle) + 8.0;
     float luceCentroIntensity = intensitaLuciLaterali * smoothstep(cos(radians(luceCentroAngle + luceCentroEpsilon)), cos(radians(luceCentroAngle)), luceCentroTheta) * 1.0;
     // Calcolo posizione interpolata nello spazio luce centrale
     vec4 fragPosLuceCentroSpace = 0.5 * fs_in.FragPosLuceDxSpace + 0.5 * fs_in.FragPosLuceSxSpace;
