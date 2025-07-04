@@ -12,6 +12,7 @@ The project uses **OBJ models** along with their respective **MTL files** to sim
 - Zoom in and out with the **mouse wheel**.
 - Press **M** to cycle through different **T-shirt textures** applied to the 3D character model.
 - Press **L** to adjust the **lighting intensity**, cycling through four preset levels: **Off**, **Low**, **Medium**, and **High**.
+- Press **C** to switch between different **scene environments**.
 
 ---
 
