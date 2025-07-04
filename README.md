@@ -28,6 +28,12 @@ This makes it easy to open and build the project without additional setup or con
 
 ---
 
+## Textures
+
+All the textures used in this project can be found [here](Progetto\x64\Debug\tex)
+
+---
+
 ## Authors
 
 This project was developed by **Michele Cipriani** and **Tommaso Vilotto**.
