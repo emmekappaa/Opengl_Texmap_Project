@@ -17,7 +17,6 @@ imgui.ini
 /x64/Debug/Progetto.exe
 
 # File di configurazione del progetto
-Progetto.vcxproj
 Progetto.vcxproj.filters
 
 # Oggetti generati nella build Debug

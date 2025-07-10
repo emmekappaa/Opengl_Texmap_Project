@@ -69,7 +69,7 @@ unsigned int planeIndices[] = {
     2, 3, 0
 };
 unsigned int planeVAO = 0, planeVBO = 0, planeEBO = 0;
-unsigned int floorDiffuse, floorNormal, floorRoughness;
+unsigned int floorDiffuse, floorNormal, floorgloss;
 
 // === Wall (Muri) ===
 // Vertici del muro: posizione (3), normale (3), texcoord (2), tangente (3), bitangente (3)
@@ -86,7 +86,7 @@ float wallVertices[] = {
 
 unsigned int wallIndices[] = { 0, 1, 2, 2, 3, 0 };
 unsigned int wallVAO = 0, wallVBO = 0, wallEBO = 0;
-unsigned int wallDiffuse, wallNormal, wallRoughness;
+unsigned int wallDiffuse, wallNormal, wallgloss;
 
 
 unsigned int ceilingVAO = 0, ceilingVBO = 0, ceilingEBO = 0;
@@ -118,7 +118,7 @@ glm::vec3 farettoDxPos = glm::vec3(
 // Risultato: circa (1.782247, 2.181563, 3.363492)
 
 // Soffitto
-unsigned int ceilingDiffuse, ceilingNormal, ceilingRoughness;
+unsigned int ceilingDiffuse, ceilingNormal, ceilinggloss;
 
 // Limiti della stanza (calcolati in base alla posizione e dimensione dei muri)
 const float room_min_x = -0.0029815f - 9.288005f/2.0f - 4.14f + 0.5f; // +0.5f margine per non attraversare il muro
@@ -220,9 +220,9 @@ const char* intensitaLabels[] = { "Off", "Low", "Medium", "High" };
 
 // === Variabili globali per gestione scena e texture extra ===
 int sceneState = 0; // 0: tutto visibile, 1: nascosto cemento, 2: nascosto Marble, 3: nascosto quarzite, 4: nascosto piastrelle
-unsigned int floorQuarziteDiffuse, floorQuarziteNormal, floorQuarziteRoughness;
-unsigned int floorTilesDiffuse, floorTilesNormal, floorTilesRoughness;
-unsigned int floorTilesMDiffuse, floorTilesMNormal, floorTilesMRoughness;
+unsigned int floorQuarziteDiffuse, floorQuarziteNormal, floorQuarzitegloss;
+unsigned int floorTilesDiffuse, floorTilesNormal, floorTilesgloss;
+unsigned int floorTilesMDiffuse, floorTilesMNormal, floorTilesMgloss;
 
 int main()
 {
@@ -413,28 +413,28 @@ int main()
     // === Caricamento texture per il Soffitto ===
     ceilingDiffuse = loadTexture("./Progetto/x64/Debug/tex/soffitto/Ceiling_Drop_Tiles_001_basecolor.jpg");
     ceilingNormal = loadTexture("./Progetto/x64/Debug/tex/soffitto/Ceiling_Drop_Tiles_001_normal.jpg");
-    ceilingRoughness = loadTexture("./Progetto/x64/Debug/tex/soffitto/Ceiling_Drop_Tiles_001_roughness.jpg");
+    ceilinggloss = loadTexture("./Progetto/x64/Debug/tex/soffitto/Ceiling_Drop_Tiles_001_gloss.jpg");
 
     // === Caricamento texture Poliigon per il pavimento ===
     floorDiffuse = loadTexture("./Progetto/x64/Debug/tex/pavimento_cemento/Poliigon_ConcreteFloorPoured_7656_BaseColor.jpg");
     floorNormal = loadTexture("./Progetto/x64/Debug/tex/pavimento_cemento/Poliigon_ConcreteFloorPoured_7656_Normal.png");
-    floorRoughness = loadTexture("./Progetto/x64/Debug/tex/pavimento_cemento/Poliigon_ConcreteFloorPoured_7656_Roughness.jpg");
+    floorgloss = loadTexture("./Progetto/x64/Debug/tex/pavimento_cemento/Poliigon_ConcreteFloorPoured_7656_gloss.jpg");
 
     // === Caricamento texture piastrelle Marble ===
     floorTilesMDiffuse = loadTexture("./Progetto/x64/Debug/tex/pavimento_stelle/Patterned_Marble_Tiles_vichadav_8K_BaseColor.jpg");
     floorTilesMNormal = loadTexture("./Progetto/x64/Debug/tex/pavimento_stelle/Patterned_Marble_Tiles_vichadav_8K_Normal.jpg");
-    floorTilesMRoughness = loadTexture("./Progetto/x64/Debug/tex/pavimento_stelle/Patterned_Marble_Tiles_vichadav_8K_Roughness.jpg");
+    floorTilesMgloss = loadTexture("./Progetto/x64/Debug/tex/pavimento_stelle/Patterned_Marble_Tiles_vichadav_8K_gloss.jpg");
 
 
     // === Caricamento texture quarzite ===
     floorQuarziteDiffuse = loadTexture("./Progetto/x64/Debug/tex/pavimento_quarzite/Poliigon_quarzite_5212_BaseColor.jpg");
     floorQuarziteNormal = loadTexture("./Progetto/x64/Debug/tex/pavimento_quarzite/Poliigon_quarzite_5212_Normal.png");
-    floorQuarziteRoughness = loadTexture("./Progetto/x64/Debug/tex/pavimento_quarzite/Poliigon_quarzite_5212_Roughness.jpg");
+    floorQuarzitegloss = loadTexture("./Progetto/x64/Debug/tex/pavimento_quarzite/Poliigon_quarzite_5212_gloss.jpg");
 
     // === Caricamento texture piastrelle ===
     floorTilesDiffuse = loadTexture("./Progetto/x64/Debug/tex/pavimento_piastrelle/Poliigon_TilesCeramicWhite_6956_BaseColor.jpg");
     floorTilesNormal = loadTexture("./Progetto/x64/Debug/tex/pavimento_piastrelle/Poliigon_TilesCeramicWhite_6956_Normal.png");
-    floorTilesRoughness = loadTexture("./Progetto/x64/Debug/tex/pavimento_piastrelle/Poliigon_TilesCeramicWhite_6956_Roughness.jpg");
+    floorTilesgloss = loadTexture("./Progetto/x64/Debug/tex/pavimento_piastrelle/Poliigon_TilesCeramicWhite_6956_gloss.jpg");
 
     // === Inizializzazione VAO/VBO/EBO per il muro ===
     glGenVertexArrays(1, &wallVAO);
@@ -466,7 +466,7 @@ int main()
     // === Caricamento texture per i muri ===
     wallDiffuse = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_BaseColor.jpg");
     wallNormal = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_Normal.png");
-    wallRoughness = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_Roughness.jpg");
+    wallgloss = loadTexture("./Progetto/x64/Debug/tex/muri/Poliigon_PlasterPainted_7664_gloss.jpg");
 
     // Ciclo di rendering principale
     while (!glfwWindowShouldClose(window))
@@ -862,7 +862,7 @@ void RenderScene(Shader &shader)
         glBindTexture(GL_TEXTURE_2D, ceilingNormal);
         shader.setInt("texture_normal1", 1);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, ceilingRoughness);
+        glBindTexture(GL_TEXTURE_2D, ceilinggloss);
         shader.setInt("texture_specular1", 2);
 
         model = glm::mat4(1.0f);
@@ -881,7 +881,7 @@ void RenderScene(Shader &shader)
         glBindTexture(GL_TEXTURE_2D, wallNormal);
         shader.setInt("texture_normal1", 1);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, wallRoughness);
+        glBindTexture(GL_TEXTURE_2D, wallgloss);
         shader.setInt("texture_specular1", 2);
 
         float wall_height = 3.0f;
@@ -930,7 +930,7 @@ void RenderScene(Shader &shader)
         glBindTexture(GL_TEXTURE_2D, floorQuarziteNormal);
         shader.setInt("texture_normal1", 1);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, floorQuarziteRoughness);
+        glBindTexture(GL_TEXTURE_2D, floorQuarzitegloss);
         shader.setInt("texture_specular1", 2);
     } else if (sceneState == 4) {
         // Pavimento piastrelle
@@ -941,7 +941,7 @@ void RenderScene(Shader &shader)
         glBindTexture(GL_TEXTURE_2D, floorTilesNormal);
         shader.setInt("texture_normal1", 1);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, floorTilesRoughness);
+        glBindTexture(GL_TEXTURE_2D, floorTilesgloss);
         shader.setInt("texture_specular1", 2);
 	}
     else if (sceneState == 2) {
@@ -953,7 +953,7 @@ void RenderScene(Shader &shader)
         glBindTexture(GL_TEXTURE_2D, floorTilesMNormal);
         shader.setInt("texture_normal1", 1);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, floorTilesMRoughness);
+        glBindTexture(GL_TEXTURE_2D, floorTilesMgloss);
         shader.setInt("texture_specular1", 2);
     } else {
         // Pavimento cemento
@@ -964,7 +964,7 @@ void RenderScene(Shader &shader)
         glBindTexture(GL_TEXTURE_2D, floorNormal);
         shader.setInt("texture_normal1", 1);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, floorRoughness);
+        glBindTexture(GL_TEXTURE_2D, floorgloss);
         shader.setInt("texture_specular1", 2);
     }
 
